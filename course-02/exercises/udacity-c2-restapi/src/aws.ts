@@ -16,6 +16,7 @@ export const s3 = new AWS.S3({
 });
 
 
+
 /* getGetSignedUrl generates an aws signed url to retreive an item
  * @Params
  *    key: string - the filename to be put into the s3 bucket

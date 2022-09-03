@@ -1,4 +1,5 @@
 import express, { Router, Request, Response } from 'express';
+import { request } from 'http';
 // import bodyParser from 'body-parser'; deprecated
 const bodyParser = require('body-parser')
 
@@ -35,7 +36,7 @@ import { Car, cars as cars_list } from './cars';
       }
 
       return res.status(200)
-                .send(`Welcome to the Cloud, ${name}!`);
+                .send(`Welcome to the Cloud, ${name}! thaba7`);
   } );
 
   // Get a greeting to a specific person to demonstrate req.query
@@ -63,7 +64,7 @@ import { Car, cars as cars_list } from './cars';
 
       if ( !name ) {
         return res.status(400)
-                  .send(`name is required`);
+                  .send(`name is required from post`);
       }
 
       return res.status(200)
@@ -72,13 +73,58 @@ import { Car, cars as cars_list } from './cars';
 
   // @TODO Add an endpoint to GET a list of cars
   // it should be filterable by make with a query paramater
+  app.get("/cars/", (req: Request, res: Response) => {
+      let { make } = req.query;
+
+      let carsMadeByMaker = cars;
+      
+      if ( make ) {
+        carsMadeByMaker = cars.filter((car)=> car.make === make)
+      }
+
+      return res.status(200).send(carsMadeByMaker);
+  })
 
   // @TODO Add an endpoint to get a specific car
   // it should require id
   // it should fail gracefully if no matching car is found
 
+  app.get("/cars/:id", ( req: Request, res: Response ) => {
+    let { id } = req.params;
+
+    if ( !id ) {
+      return res.status(400)
+      .send(`id is required from get`);
+    }
+    let carsWithId = cars;
+    carsWithId = cars.filter( car => (car.id).toString() == id );
+
+    if(carsWithId && carsWithId.length === 0){
+      return res.status(404)
+      .send(`Car with ${id} Not found`);
+    }
+
+    return res.status(200).send(carsWithId);
+})
+
   /// @TODO Add an endpoint to post a new car to our list
   // it should require id, type, model, and cost
+  app.post("/cars/" , (req: Request , res: Response) => {
+    let {make , type , model , cost , id} = req.body;
+
+    if(!make || !type || !model || !cost || !id ){
+      return res.status(400)
+      .send(`make , type , model , cost , id is required from post`);
+    }
+
+    const new_car: Car = {
+      make: make, type: type, model: model, cost: cost, id: id
+    }
+
+    cars.push(new_car);
+    return res.status(201).send(new_car);
+
+  });
 
   // Start the Server
   app.listen( port, () => {

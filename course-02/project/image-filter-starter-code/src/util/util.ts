@@ -1,6 +1,5 @@
 import fs from "fs";
 import Jimp = require("jimp");
-
 // filterImageFromURL
 // helper function to download, filter, and save the filtered image locally
 // returns the absolute path to the local image
@@ -9,23 +8,23 @@ import Jimp = require("jimp");
 // RETURNS
 //    an absolute path to a filtered image locally saved file
 export async function filterImageFromURL(inputURL: string): Promise<string> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const photo = await Jimp.read(inputURL);
-      const outpath =
-        "/tmp/filtered." + Math.floor(Math.random() * 2000) + ".jpg";
-      await photo
-        .resize(256, 256) // resize
-        .quality(60) // set JPEG quality
-        .greyscale() // set greyscale
-        .write(__dirname + outpath, (img) => {
-          resolve(__dirname + outpath);
-        });
-    } catch (error) {
-      reject(error);
-    }
+  return new Promise((resolve, reject) => {
+      Jimp.read(inputURL).then(photo => {
+          const outpath = '/tmp/filtered.' + Math.floor(Math.random() * 2000) + '.jpg';
+          photo
+              .resize(256, 256) // resize
+              .quality(60) // set JPEG quality
+              .greyscale() // set greyscale
+              .write(__dirname + outpath, (img) => {
+                  resolve(__dirname + outpath);
+              });
+      }).catch(err => {
+          console.error(err);
+          reject("Could not read image.");
+      })
   });
 }
+
 
 // deleteLocalFiles
 // helper function to delete files on the local disk
@@ -36,4 +35,15 @@ export async function deleteLocalFiles(files: Array<string>) {
   for (let file of files) {
     fs.unlinkSync(file);
   }
+}
+
+export function imageNotExist(image_url: string){
+  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var http = new XMLHttpRequest();
+
+  http.open('HEAD', image_url, false);
+  http.send();
+
+  return http.status === 404;
+
 }

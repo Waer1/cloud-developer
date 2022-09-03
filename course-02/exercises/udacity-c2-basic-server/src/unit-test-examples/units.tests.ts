@@ -1,6 +1,7 @@
 import { add, divide } from './units';
 
 import { expect } from 'chai';
+
 import 'mocha';
 
 describe('add function', () => {

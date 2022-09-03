@@ -18,13 +18,31 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get('/:id', 
+    async (req: Request, res: Response) => {
+        //@TODO try it yourself
+        let { id } = req.params;
+        const items = await FeedItem.findByPk(id);
+        console.log(items);
+        res.send(items);
+});
+
 
 // update a specific resource
 router.patch('/:id', 
     requireAuth, 
     async (req: Request, res: Response) => {
         //@TODO try it yourself
-        res.status(500).send("not implemented")
+        let { id } = req.params;
+        const found = await FeedItem.findByPk(id);
+
+        if(found === null) {
+            res.status(500).send("not implemented");
+        }
+        const items = await FeedItem.update(
+            {caption: "new caption"},
+            { where: { id: id } }
+        );
 });
 
 
@@ -56,10 +74,9 @@ router.post('/',
         return res.status(400).send({ message: 'File url is required' });
     }
 
-    const item = await new FeedItem({
-            caption: caption,
-            url: fileName
-    });
+    let item = await new FeedItem();
+    item.caption = caption;
+    item.url = fileName;
 
     const saved_item = await item.save();
 
